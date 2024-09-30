@@ -1,3 +1,4 @@
+import 'package:final_project/view/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/model/constants.dart';
 import 'package:final_project/view/login_fb.dart';
@@ -15,7 +16,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
-  final bool _rememberMe = false;
+  var _emailInvalid = false;
+  var _passwordInvalid = false;
+  bool _rememberMe = false;
 
   @override
   void initState() {
@@ -42,10 +45,11 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14),
-              prefixIcon: Icon(
+              errorText: _emailInvalid ? "  Email khong hop le" : null,
+              contentPadding: const EdgeInsets.only(top: 14),
+              prefixIcon: const Icon(
                 Icons.email,
                 color: Colors.white,
               ),
@@ -79,10 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14),
-              prefixIcon: Icon(
+              errorText: _passwordInvalid ? "  Password khong hop le" : null,
+              contentPadding: const EdgeInsets.only(top: 14),
+              prefixIcon: const Icon(
                 Icons.lock,
                 color: Colors.white,
               ),
@@ -121,13 +126,10 @@ class _LoginScreenState extends State<LoginScreen> {
               value: _rememberMe,
               checkColor: Colors.green,
               activeColor: Colors.white,
-              onChanged: (value) async {
-                // SharedPreferences prefs = await SharedPreferences.getInstance();
-                // await prefs.setBool('rememberMe', value!);
-                // setState(() {
-                //   _rememberMe = value;
-                //   print("Remember me status: $_rememberMe");
-                // });
+              onChanged: (newBool) {
+                setState(() {
+                  _rememberMe = newBool!;
+                });
               },
             ),
           ),
@@ -156,27 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-        onPressed: () async {
-          // try {
-          //   await FirebaseAuth.instance.signInWithEmailAndPassword(
-          //     email: _emailTextController.text,
-          //     password: _passwordTextController.text,
-          //   );
-          //   Navigator.push(
-          //     // ignore: use_build_context_synchronously
-          //     context,
-          //     MaterialPageRoute(builder: (context) => const HomeScreen()),
-          //   );
-          // } on FirebaseAuthException catch (e) {
-          //   if (e.code == 'user-not-found') {
-          //     // ignore: avoid_print
-          //     print('No user found for that email.');
-          //   } else if (e.code == 'wrong-password') {
-          //     // ignore: avoid_print
-          //     print('Wrong password provided for that user.');
-          //   }
-          // }
-        },
+        onPressed: onSignInClicked,
         child: const Text(
           'LOGIN',
           style: TextStyle(
@@ -189,6 +171,27 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void onSignInClicked() {
+    setState(() {
+      RegExp gmailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@gmail\.com$");
+      if (_emailTextController.text.length < 6 ||
+          !gmailRegex.hasMatch(_emailTextController.text)) {
+        _emailInvalid = true;
+      } else {
+        _emailInvalid = false;
+      }
+      if (_passwordTextController.text.length < 6) {
+        _passwordInvalid = true;
+      } else {
+        _passwordInvalid = false;
+      }
+      if (!_emailInvalid && !_passwordInvalid) {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
+      }
+    });
   }
 
   Widget _buildSignInWithText() {

@@ -13,7 +13,7 @@ class _LoginFacebookState extends State<LoginFacebook> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Facebook Login'),
+        title: const Text('Facebook Sign In'),
       ),
       body: Center(
         child: ElevatedButton(
